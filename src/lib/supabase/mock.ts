@@ -101,6 +101,7 @@ class MockQueryBuilder {
   private filters: { col: string; op: string; val: unknown }[] = [];
   private orderBy: { col: string; dir: 'asc' | 'desc' } | null = null;
   private limitCount: number | null = null;
+  private isMaybeSingle = false;
   private selectRaw: string | null = null;
   private inserted: unknown[] | null = null;
   private updated: Record<string, unknown> | null = null;
@@ -134,6 +135,7 @@ class MockQueryBuilder {
   }
   limit(n: number): this { this.limitCount = n; return this; }
   single(): this { this.limitCount = 1; return this; }
+  maybeSingle(): this { this.limitCount = 1; this.isMaybeSingle = true; return this; }
 
   insert(rows: unknown[] | Record<string, unknown>): this {
     this.inserted = Array.isArray(rows) ? rows : [rows];
@@ -235,6 +237,10 @@ class MockQueryBuilder {
     filtered = this.sortData(filtered);
 
     if (this.limitCount && this.limitCount === 1) {
+      if (this.isMaybeSingle && filtered.length === 0) {
+        resolve({ data: null, error: null });
+        return;
+      }
       resolve({ data: (filtered[0] ?? null) as unknown as null, error: filtered.length === 0 ? { message: 'No rows found', details: '', hint: '', code: 'PGRST116' } : null });
       return;
     }
