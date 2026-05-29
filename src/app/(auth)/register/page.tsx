@@ -27,7 +27,6 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showCheckEmail, setShowCheckEmail] = useState(false);
   const router = useRouter();
 
   const handleEmailRegister = async (e: React.FormEvent) => {
@@ -59,8 +58,7 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
-    setShowCheckEmail(true);
-    setLoading(false);
+    router.push('/onboarding');
   };
 
   const handleGoogleLogin = async () => {
@@ -87,87 +85,69 @@ export default function RegisterPage() {
           <p className="text-sm text-ink-muted mt-1">Create an account to begin practicing</p>
         </div>
 
-        {showCheckEmail ? (
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-              <Mail size={32} className="text-primary" />
-            </div>
-            <h2 className="text-xl font-bold text-ink">Check your email</h2>
-            <p className="text-sm text-ink-muted">
-              We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then log in.
-            </p>
-            <p className="text-xs text-ink-muted/60">Didn't receive it? Check your spam folder.</p>
-            <Button variant="outline" onClick={() => setShowCheckEmail(false)} className="mt-4">
-              Use a different email
-            </Button>
+        <form onSubmit={handleEmailRegister} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Full Name</Label>
+            <Input
+              placeholder="Priya Das"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </div>
-        ) : (
-          <>
-            <form onSubmit={handleEmailRegister} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Full Name</Label>
-                <Input
-                  placeholder="Priya Das"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input
-                  type="email"
-                  placeholder="you@gmail.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <p className="text-[10px] text-ink-muted">Use Gmail, Outlook, Yahoo, Rediffmail, iCloud, or ProtonMail</p>
-              </div>
-              <div className="space-y-2">
-                <Label>Password</Label>
-                <Input
-                  type="password"
-                  placeholder="At least 6 characters"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                />
-              </div>
+          <div className="space-y-2">
+            <Label>Email</Label>
+            <Input
+              type="email"
+              placeholder="you@gmail.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <p className="text-[10px] text-ink-muted">Use Gmail, Outlook, Yahoo, Rediffmail, iCloud, or ProtonMail</p>
+          </div>
+          <div className="space-y-2">
+            <Label>Password</Label>
+            <Input
+              type="password"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
 
-              {error && (
-                <p className="text-sm text-danger bg-danger/5 px-3 py-2 rounded-lg">{error}</p>
-              )}
+          {error && (
+            <p className="text-sm text-danger bg-danger/5 px-3 py-2 rounded-lg">{error}</p>
+          )}
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                <Mail size={18} />
-                {loading ? 'Creating account...' : 'Sign up with Email'}
-              </Button>
-            </form>
+          <Button type="submit" className="w-full" disabled={loading}>
+            <Mail size={18} />
+            {loading ? 'Creating account...' : 'Sign up with Email'}
+          </Button>
+        </form>
 
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-border" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-bg px-2 text-ink-muted">or</span>
-              </div>
-            </div>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-bg px-2 text-ink-muted">or</span>
+          </div>
+        </div>
 
-            <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
-              <Globe size={18} />
-              Continue with Google
-            </Button>
+        <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+          <Globe size={18} />
+          Continue with Google
+        </Button>
 
-            <p className="text-center text-sm text-ink-muted mt-6">
-              Already have an account?{' '}
-              <Link href="/login" className="text-primary font-bold hover:underline">
-                Log in
-              </Link>
-            </p>
-          </>
-        )}
+        <p className="text-center text-sm text-ink-muted mt-6">
+          Already have an account?{' '}
+          <Link href="/login" className="text-primary font-bold hover:underline">
+            Log in
+          </Link>
+        </p>
       </div>
     </div>
   );
