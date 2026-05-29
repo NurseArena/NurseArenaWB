@@ -1,0 +1,14 @@
+# For a full reference see:
+# https://supabase.com/docs/guides/cli/config
+
+[auth]
+enabled = true
+
+[db]
+# Postgres connection settings for local development
+port = 54322
+
+[auth.external]
+# OAuth providers
+# Enable Google OAuth (set credentials in Supabase dashboard)
+google = false
