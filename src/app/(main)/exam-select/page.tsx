@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/store/authStore';
 import { ExamSelector } from '@/components/exam/ExamSelector';
 import { motion } from 'framer-motion';
-import { GraduationCap } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import type { ExamCode } from '@/lib/exam-config';
 
 export default function ExamSelectPage() {
@@ -32,7 +32,7 @@ export default function ExamSelectPage() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
       <div className="text-center">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
-          <GraduationCap size={32} className="text-white" />
+          <LogoIcon size={32} />
         </div>
         <h1 className="text-3xl font-bold text-ink">Choose Your Exam</h1>
         <p className="text-ink-muted mt-2">

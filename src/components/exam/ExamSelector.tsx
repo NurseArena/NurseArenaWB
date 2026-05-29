@@ -1,7 +1,8 @@
 'use client';
 import { motion } from 'framer-motion';
 import { EXAMS, type ExamCode } from '@/lib/exam-config';
-import { GraduationCap, BookOpen } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 
 interface ExamSelectorProps {
   onSelect: (code: ExamCode) => void;
@@ -28,7 +29,7 @@ export function ExamSelector({ onSelect, filterExam }: ExamSelectorProps) {
             style={{ backgroundColor: exam.color + '15' }}
           >
             {exam.code.startsWith('JENPAS') ? (
-              <GraduationCap size={28} style={{ color: exam.color }} />
+              <LogoIcon size={28} />
             ) : (
               <BookOpen size={28} style={{ color: exam.color }} />
             )}

@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useExamStore } from '@/store/examStore';
-import { GraduationCap, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import { EXAMS } from '@/lib/exam-config';
 
 export default function PracticePage() {
@@ -68,7 +69,7 @@ export default function PracticePage() {
                 className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
                 style={{ backgroundColor: exam.color + '20' }}
               >
-                <GraduationCap size={24} style={{ color: exam.color }} />
+                <LogoIcon size={24} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-ink">{exam.shortName}</p>

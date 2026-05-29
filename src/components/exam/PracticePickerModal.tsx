@@ -2,7 +2,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useExamStore } from '@/store/examStore';
 import { useRouter } from 'next/navigation';
-import { GraduationCap, ArrowRight, X } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import { EXAMS } from '@/lib/exam-config';
 import { Card } from '@/components/ui/card';
 
@@ -64,7 +65,7 @@ export function PracticePickerModal({ open, onClose, targetExams }: PracticePick
                         className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
                         style={{ backgroundColor: exam.color + '20' }}
                       >
-                        <GraduationCap size={22} style={{ color: exam.color }} />
+                        <LogoIcon size={22} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-sm text-ink">{exam.shortName}</p>

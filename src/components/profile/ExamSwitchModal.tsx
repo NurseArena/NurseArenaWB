@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { AlertTriangle, X, GraduationCap } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import { EXAMS, type ExamCode } from '@/lib/exam-config';
 import { useExam } from '@/hooks/useExam';
 
@@ -60,7 +61,7 @@ export function ExamSwitchModal({ open, onClose }: ExamSwitchModalProps) {
                     }`}
                   >
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: config.color + '20' }}>
-                      <GraduationCap size={20} style={{ color: config.color }} />
+                      <LogoIcon size={20} />
                     </div>
                     <div className="text-left">
                       <p className="font-bold text-ink">{config.shortName}</p>

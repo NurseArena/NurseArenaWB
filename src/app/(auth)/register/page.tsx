@@ -4,7 +4,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { GraduationCap, Mail, Globe } from 'lucide-react';
+import { Mail, Globe } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -73,7 +74,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
-            <GraduationCap size={28} className="text-white" />
+            <LogoIcon size={28} />
           </div>
           <h1 className="text-2xl font-bold text-ink">Start your journey</h1>
           <p className="text-sm text-ink-muted mt-1">Create an account to begin practicing</p>

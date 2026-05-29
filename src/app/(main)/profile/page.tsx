@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useXP } from '@/hooks/useXP';
-import { LogOut, User, Sun, Moon, Trophy, Target, Zap, Star, GraduationCap } from 'lucide-react';
+import { LogOut, User, Sun, Moon, Trophy, Target, Zap, Star } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import { useTheme } from '@/components/ThemeProvider';
 import { RAPID_FIRE_TIERS } from '@/lib/xp';
 import { EXAMS } from '@/lib/exam-config';
@@ -84,7 +85,7 @@ export default function ProfilePage() {
       {targetExams.length > 0 && (
         <Card className="p-5">
           <h2 className="text-lg font-bold text-ink mb-4 flex items-center gap-2">
-            <GraduationCap size={18} className="text-primary" /> Enrolled Exams
+            <LogoIcon size={18} /> Enrolled Exams
           </h2>
           <div className="space-y-2">
             {targetExams.map((e) => {
@@ -95,7 +96,7 @@ export default function ProfilePage() {
                   className="flex items-center gap-3 px-3 py-2 rounded-xl bg-surface2"
                 >
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: (exam?.color ?? '#6366f1') + '20' }}>
-                    <GraduationCap size={16} style={{ color: exam?.color ?? '#6366f1' }} />
+                    <LogoIcon size={16} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-ink">{exam?.shortName ?? e}</p>

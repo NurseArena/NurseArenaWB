@@ -4,7 +4,8 @@ import { useTheme } from '@/components/ThemeProvider';
 import { useExam } from '@/hooks/useExam';
 import { useAuthStore } from '@/store/authStore';
 import { createClient } from '@/lib/supabase/client';
-import { Moon, Sun, Bell, GraduationCap, Star, X, Check } from 'lucide-react';
+import { Moon, Sun, Bell, Star, X, Check } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 import Link from 'next/link';
 import type { Notification } from '@/types/user';
 import { marksToXp } from '@/lib/xp';
@@ -74,7 +75,7 @@ export function Navbar() {
         <div className="flex items-center gap-4 lg:hidden">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <GraduationCap size={18} className="text-white" />
+              <LogoIcon size={18} />
             </div>
             <span className="font-bold text-ink text-sm">NurseArena</span>
           </Link>

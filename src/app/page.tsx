@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { GraduationCap, BookOpen, Swords, Trophy, BarChart3, Zap, ScrollText, CheckCircle } from 'lucide-react';
+import { BookOpen, Swords, Trophy, BarChart3, Zap, ScrollText, CheckCircle } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 
 const TAGLINES = [
   'Battle Your Way to WB Nursing Success',
@@ -66,7 +67,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <GraduationCap size={22} className="text-white" />
+              <LogoIcon size={22} />
             </div>
             <span className="text-xl font-bold text-ink">NurseArena</span>
           </div>

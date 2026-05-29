@@ -10,13 +10,13 @@ import {
   Trophy,
   BarChart3,
   User,
-  GraduationCap,
   ScrollText,
 } from 'lucide-react';
+import { LogoIcon } from '@/components/LogoIcon';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { icon: GraduationCap, label: 'Topic-wise', href: '/subjects' },
+  { icon: BookOpen, label: 'Topic-wise', href: '/subjects' },
   { icon: Swords, label: 'Mock Test', href: '/mock-test' },
   { icon: Zap, label: 'Rapid Fire', href: '/rapid-fire' },
   { icon: ScrollText, label: 'PYQs', href: '/pyq' },
@@ -34,7 +34,7 @@ export function Sidebar() {
       <div className="p-6 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-            <GraduationCap size={22} className="text-white" />
+            <LogoIcon size={22} />
           </div>
           <div>
             <h1 className="text-lg font-bold text-ink">NurseArena</h1>
