@@ -70,3 +70,4 @@ Desktop.ini
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.mds/
