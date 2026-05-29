@@ -32,7 +32,7 @@ export default function ExamSelectPage() {
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
       <div className="text-center">
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
-          <LogoIcon size={32} />
+          <LogoIcon size={48} />
         </div>
         <h1 className="text-3xl font-bold text-ink">Choose Your Exam</h1>
         <p className="text-ink-muted mt-2">

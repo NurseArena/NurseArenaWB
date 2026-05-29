@@ -112,7 +112,7 @@ export default function OnboardingPage() {
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
-            <LogoIcon size={28} />
+            <LogoIcon size={48} />
           </div>
           <h1 className="text-2xl font-bold text-ink">Complete Your Profile</h1>
           <p className="text-sm text-ink-muted mt-1">Step {step} of 3</p>

@@ -30,15 +30,38 @@ export default function LoginPage() {
       setLoading(false);
       return;
     }
-    const { data: profile } = await supabase
+    let { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
       .single();
+
     if (!profile) {
-      setError('Profile not found. Please register.');
-      setLoading(false);
-      return;
+      const { data: newProfile } = await supabase
+        .from('profiles')
+        .upsert({
+          id: data.user.id,
+          displayName: data.user.email,
+          email: data.user.email ?? '',
+          targetExams: [],
+          totalMarksEarned: 0,
+          totalQuestionsAttempted: 0,
+          totalCorrect: 0,
+          totalWrong: 0,
+          totalSkipped: 0,
+          bestMockScore: 0,
+          rapidFireUnlockedTier: 1,
+          streakDays: 0,
+          profileCompletePct: 0,
+        }, { onConflict: 'id', ignoreDuplicates: true })
+        .select()
+        .single();
+      profile = newProfile ?? null;
+      if (!profile) {
+        setError('Could not create profile.');
+        setLoading(false);
+        return;
+      }
     }
     setUser(profile as Profile);
     if ((profile as Profile).isAdmin) {
@@ -66,7 +89,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
-            <LogoIcon size={28} />
+            <LogoIcon size={48} />
           </div>
           <h1 className="text-2xl font-bold text-ink">Welcome back</h1>
           <p className="text-sm text-ink-muted mt-1">Log in to continue your streak</p>

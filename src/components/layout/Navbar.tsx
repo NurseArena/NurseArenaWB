@@ -75,7 +75,7 @@ export function Navbar() {
         <div className="flex items-center gap-4 lg:hidden">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <LogoIcon size={18} />
+              <LogoIcon size={34} />
             </div>
             <span className="font-bold text-ink text-sm">NurseArena</span>
           </Link>
