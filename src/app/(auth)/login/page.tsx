@@ -20,16 +20,20 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleEmailLogin = async (e: React.FormEvent) => {
+    console.log('Login submit triggered', { email, password });
     e.preventDefault();
     setLoading(true);
     setError('');
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error || !data?.user) {
-      setError(error?.message ?? 'Invalid email or password');
-      setLoading(false);
-      return;
-    }
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('Supabase response', { data, error });
+      if (error || !data?.user) {
+        setError(error?.message ?? 'Invalid email or password');
+        setLoading(false);
+        return;
+      }
+
     let { data: profile } = await supabase
       .from('profiles')
       .select('*')
@@ -69,7 +73,13 @@ export default function LoginPage() {
     } else {
       router.push('/dashboard');
     }
-  };
+    setLoading(false);
+  } catch (err) {
+    console.error('Login error', err);
+    setError('An unexpected error occurred');
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4">
