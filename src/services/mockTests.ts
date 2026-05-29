@@ -20,9 +20,9 @@ export async function getMockTestCountdown(eventId: number) {
     .from('mock_test_events')
     .select('id, exam_id, title, description, status, scheduled_at, duration_min, scoring_profile_id')
     .eq('id', eventId)
-    .single();
+    .maybeSingle();
   if (error) throw error;
-  return data as MockTestEvent;
+  return data as MockTestEvent | null;
 }
 
 export function getTimeUntilEvent(scheduledAt: string) {
@@ -51,6 +51,7 @@ const CLIENT_QUESTION_FIELDS = 'id, question, option_a, option_b, option_c, opti
 export async function startMockTest(eventId: number, _userId: string) {
   const supabase = createClient();
   const event = await getMockTestCountdown(eventId);
+  if (!event) throw new Error('Mock test not found');
   if (!isWithinWindow(event.scheduled_at, event.duration_min)) {
     throw new Error('Mock test is not currently active');
   }

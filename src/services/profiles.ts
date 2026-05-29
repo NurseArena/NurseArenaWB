@@ -13,9 +13,9 @@ export async function getProfile(userId: string) {
     .from('profiles')
     .select(PROFILE_FIELDS)
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   if (error) throw error;
-  return data as Profile;
+  return data as Profile | null;
 }
 
 export async function updateProfile(updates: Partial<Profile>) {
@@ -24,8 +24,7 @@ export async function updateProfile(updates: Partial<Profile>) {
   if (!authUser) throw new Error('Unauthorized');
   const { data, error } = await supabase
     .from('profiles')
-    .update(updates)
-    .eq('id', authUser.id)
+    .upsert({ id: authUser.id, ...updates }, { onConflict: 'id' })
     .select()
     .single();
   if (error) throw error;
@@ -42,7 +41,7 @@ export async function checkAndUpdateStreak(userId: string) {
     .from('profiles')
     .select('streakDays, lastLoginAt')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   if (!profile) return null;
 
   const today = new Date().toISOString().split('T')[0];
@@ -66,7 +65,7 @@ export async function checkAndUpdateStreak(userId: string) {
     })
     .eq('id', userId)
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
   return data as Profile;
 }
@@ -79,16 +78,16 @@ export async function manageUser(userId: string, updates: Record<string, unknown
     .from('profiles')
     .select('is_admin')
     .eq('id', authUser.id)
-    .single();
+    .maybeSingle();
   if (!profile?.is_admin) throw new Error('Forbidden: admin-only action');
   const { data, error } = await supabase
     .from('profiles')
     .update(updates)
     .eq('id', userId)
     .select()
-    .single();
+    .maybeSingle();
   if (error) throw error;
-  return data as Profile;
+  return data as Profile | null;
 }
 
 export async function fetchAllUsers(limit = 1000, offset = 0) {

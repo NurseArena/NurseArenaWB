@@ -93,7 +93,7 @@ export default function OnboardingPage() {
       };
 
       if (userId) {
-        await supabase.from('profiles').update(profileData).eq('id', userId);
+        await supabase.from('profiles').upsert({ id: userId, ...profileData }, { onConflict: 'id' });
         const storeUser = useAuthStore.getState().user;
         if (storeUser) {
           setUser({ ...storeUser, ...profileData } as typeof storeUser);

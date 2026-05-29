@@ -20,9 +20,9 @@ export async function getLiveQuizState(quizEventId: number) {
     .from('live_quiz_events')
     .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id')
     .eq('id', quizEventId)
-    .single();
+    .maybeSingle();
   if (error) throw error;
-  return data as LiveQuizEvent;
+  return data as LiveQuizEvent | null;
 }
 
 export async function joinLiveQuiz(quizEventId: number, userId: string) {
@@ -71,12 +71,12 @@ export async function fetchQuizLeaderboard(quizEventId: number) {
 
 export async function fetchQuizQuestions(quizEventId: number) {
   const supabase = createClient();
-  const quiz = await supabase
+  const { data: quiz } = await supabase
     .from('live_quiz_events')
     .select('question_set_id')
     .eq('id', quizEventId)
-    .single();
-  if (!quiz.data?.question_set_id) return [];
+    .maybeSingle();
+  if (!quiz?.question_set_id) return [];
 
   const { data, error } = await supabase
     .from('quiz_questions')

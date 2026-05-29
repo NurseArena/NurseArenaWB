@@ -46,7 +46,7 @@ async function requireAdmin() {
     .from('profiles')
     .select('is_admin')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!profile?.is_admin) {
     return { supabase: null as never, error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
