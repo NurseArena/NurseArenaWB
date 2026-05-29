@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Globe } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { LogoIcon } from '@/components/LogoIcon';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -80,25 +80,12 @@ export default function RegisterPage() {
     router.push('/onboarding');
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-4">
-            <LogoIcon size={48} />
+            <LogoIcon size={56} />
           </div>
           <h1 className="text-2xl font-bold text-ink">Start your journey</h1>
           <p className="text-sm text-ink-muted mt-1">Create an account to begin practicing</p>
@@ -146,20 +133,6 @@ export default function RegisterPage() {
             {loading ? 'Creating account...' : 'Sign up with Email'}
           </Button>
         </form>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-bg px-2 text-ink-muted">or</span>
-          </div>
-        </div>
-
-        <Button variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
-          <Globe size={18} />
-          Continue with Google
-        </Button>
 
         <p className="text-center text-sm text-ink-muted mt-6">
           Already have an account?{' '}
