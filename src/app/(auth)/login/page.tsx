@@ -32,7 +32,7 @@ export default function LoginPage() {
     }
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, is_admin')
+      .select('*')
       .eq('id', data.user.id)
       .single();
     if (!profile) {

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/store/authStore';
@@ -42,9 +42,31 @@ export default function OnboardingPage() {
   const [district, setDistrict] = useState('');
   const [institution, setInstitution] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
-  const user = useAuthStore((s) => s.user);
+  const storeUser = useAuthStore((s) => s.user);
   const setUser = useAuthStore((s) => s.setUser);
+
+  useEffect(() => {
+    async function init() {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.replace('/login');
+        return;
+      }
+      setUserId(user.id);
+      if (!storeUser) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        if (profile) setUser(profile as typeof storeUser);
+      }
+    }
+    init();
+  }, []);
 
   const toggleExam = (id: string) => {
     setTargetExams((prev) =>
@@ -70,9 +92,12 @@ export default function OnboardingPage() {
         profileCompletePct: 100,
       };
 
-      if (user) {
-        await supabase.from('profiles').update(profileData).eq('id', user.id);
-        setUser({ ...user, ...profileData } as typeof user);
+      if (userId) {
+        await supabase.from('profiles').update(profileData).eq('id', userId);
+        const storeUser = useAuthStore.getState().user;
+        if (storeUser) {
+          setUser({ ...storeUser, ...profileData } as typeof storeUser);
+        }
       }
       router.push('/dashboard');
     } catch (err) {
