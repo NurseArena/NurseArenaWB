@@ -54,16 +54,16 @@ function makeMockProfile(isAdmin: boolean, overrides?: Record<string, unknown>) 
     institution: isAdmin ? '' : 'Demo College',
     district: 'Kolkata',
     joinedAt: '2025-01-01T00:00:00Z',
-    totalMarksEarned: isAdmin ? 9999 : 450,
-    totalQuestionsAttempted: isAdmin ? 5000 : 120,
-    totalCorrect: isAdmin ? 4000 : 85,
-    totalWrong: isAdmin ? 800 : 25,
-    totalSkipped: isAdmin ? 200 : 10,
-    bestMockScore: isAdmin ? 98 : 76,
-    rapidFireUnlockedTier: isAdmin ? 5 : 2,
-    streakDays: isAdmin ? 30 : 7,
+    totalMarksEarned: 0,
+    totalQuestionsAttempted: 0,
+    totalCorrect: 0,
+    totalWrong: 0,
+    totalSkipped: 0,
+    bestMockScore: 0,
+    rapidFireUnlockedTier: 1,
+    streakDays: 0,
     lastLoginAt: new Date().toISOString(),
-    profileCompletePct: 100,
+    profileCompletePct: 0,
     isAdmin,
     ...overrides,
   };
@@ -80,12 +80,7 @@ function getMockQuizzes() {
 }
 
 function getMockNotifications() {
-  const now = new Date().toISOString();
-  const yesterday = new Date(Date.now() - 86400000).toISOString();
-  return [
-    { id: 'notif-1', title: 'New Weekly Mock Tests Live!', body: 'This week\'s mock tests are ready. Attempt now for full leaderboard credit.', targetExams: ['all'], type: 'mock_test', createdAt: now, readBy: [] },
-    { id: 'notif-2', title: 'Result Published', body: 'Your JENPAS UG Paper I mock test result is available.', targetExams: ['JENPAS_UG_P1'], type: 'result', createdAt: yesterday, readBy: [] },
-  ];
+  return [];
 }
 
 let mockDbStore: Record<string, unknown[]> = {};

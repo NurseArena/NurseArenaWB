@@ -29,7 +29,13 @@ export function Navbar() {
         .select('id, title, body, type, targetExams, createdAt, readBy')
         .order('created_at', { ascending: false })
         .limit(25);
-      if (data) setNotifications(data as Notification[]);
+      if (data) {
+        const userExams = (user as never as Record<string, unknown>).targetExams as string[] ?? [];
+        const filtered = (data as Notification[]).filter(
+          (n) => n.targetExams.includes('all') || n.targetExams.some((e) => userExams.includes(e))
+        );
+        setNotifications(filtered);
+      }
     };
     fetchNotifs();
   }, [user]);

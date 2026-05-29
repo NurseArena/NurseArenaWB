@@ -3,9 +3,11 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/store/authStore';
+import { useExamStore } from '@/store/examStore';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const setUser = useAuthStore((s) => s.setUser);
+  const setActiveExam = useExamStore((s) => s.setActiveExam);
   const initDone = useRef(false);
 
   useEffect(() => {
@@ -13,6 +15,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initDone.current = true;
 
     const supabase = createClient();
+
+    function syncActiveExam(profile: Record<string, unknown>) {
+      const targetExams = (profile.targetExams ?? profile.target_exams ?? []) as string[];
+      if (targetExams.length > 0) {
+        setActiveExam(targetExams[0] as never);
+      }
+    }
 
     (async () => {
       const res = await supabase.auth.getUser();
@@ -25,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
       if (profile) {
         const p = profile as Record<string, unknown>;
+        syncActiveExam(p);
         setUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
       }
     })();
@@ -42,13 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .maybeSingle();
         if (profile) {
           const p = profile as Record<string, unknown>;
+          syncActiveExam(p);
           setUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
         }
       },
     );
 
     return () => subscription.unsubscribe();
-  }, [setUser]);
+  }, [setUser, setActiveExam]);
 
   return children;
 }
