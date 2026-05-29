@@ -399,6 +399,30 @@ create policy "Users can view own profile"
 create policy "Users can update own profile"
   on profiles for update using (auth.uid() = id);
 
+create policy "Users can insert own profile"
+  on profiles for insert with check (auth.uid() = id);
+
+-- Auto-create profile on user signup
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = ''
+as $$
+begin
+  insert into public.profiles (id, email, displayName)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data ->> 'full_name', new.email)
+  );
+  return new;
+end;
+$$;
+
+create or replace trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
 create policy "Authenticated users can read questions"
   on questions for select to authenticated using (true);
 

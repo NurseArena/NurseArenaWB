@@ -24,7 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .maybeSingle();
       if (profile) {
-        setUser({ ...profile, isAdmin: (profile as Record<string, unknown>).is_admin } as never);
+        const p = profile as Record<string, unknown>;
+        setUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
       }
     })();
 
@@ -40,7 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq('id', session.user.id)
           .maybeSingle();
         if (profile) {
-          setUser({ ...profile, isAdmin: (profile as Record<string, unknown>).is_admin } as never);
+          const p = profile as Record<string, unknown>;
+          setUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
         }
       },
     );

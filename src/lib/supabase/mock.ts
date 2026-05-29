@@ -27,9 +27,17 @@ const MOCK_QUESTIONS = [
   { id: 'q-12', examId: 'ANM_GNM', subject: 'Life Science', topic: 'Health & Disease', difficulty: 'Medium', category: 'I', questionText: 'Which organism causes tuberculosis?', options: { A: 'Streptococcus', B: 'Mycobacterium tuberculosis', C: 'E. coli', D: 'Staphylococcus' }, correctAnswers: ['B'], explanation: 'Mycobacterium tuberculosis causes TB.' },
 ];
 
-const CREDENTIALS: Record<string, { password: string; isAdmin: boolean }> = {
-  'admin@wbnursing.app': { password: 'admin123', isAdmin: true },
-  'demo@wbnursing.app': { password: 'demo123', isAdmin: false },
+interface MockUser {
+  password: string;
+  isAdmin: boolean;
+  id: string;
+  email: string;
+  displayName: string;
+}
+
+const CREDENTIALS: Record<string, MockUser> = {
+  'admin@wbnursing.app': { password: 'admin123', isAdmin: true, id: 'admin-001', email: 'admin@wbnursing.app', displayName: 'Admin' },
+  'demo@wbnursing.app': { password: 'demo123', isAdmin: false, id: MOCK_USER_ID, email: 'demo@wbnursing.app', displayName: 'Demo User' },
 };
 
 function makeMockProfile(isAdmin: boolean, overrides?: Record<string, unknown>) {
@@ -148,7 +156,11 @@ class MockQueryBuilder {
   private getTableData(): unknown[] {
     switch (this.table) {
       case 'exams': return MOCK_EXAMS;
-      case 'profiles': return [makeMockProfile(false), makeMockProfile(true)];
+      case 'profiles': {
+        const stored = mockDbStore['profiles'];
+        if (stored && stored.length > 0) return stored;
+        return [makeMockProfile(false), makeMockProfile(true)];
+      }
       case 'attempts': return mockDbStore['attempts'] ?? [];
       case 'questions': return MOCK_QUESTIONS;
       case 'quizzes': return getMockQuizzes();
@@ -213,7 +225,8 @@ class MockQueryBuilder {
           existing.push({ ...row, id: row.id ?? `${this.table}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, created_at: new Date().toISOString() });
         }
       }
-      resolve({ data: this.upserted, error: null });
+      const result = this.limitCount === 1 ? (this.upserted[0] ?? null) : this.upserted;
+      resolve({ data: result as unknown as null, error: null });
       return;
     }
     const rawData = this.getTableData() as Record<string, unknown>[];
@@ -237,20 +250,40 @@ class MockQueryBuilder {
   finally(_onFinally: unknown): void {}
 }
 
+function makeAuthUser(email: string, isAdmin: boolean, id: string): Record<string, unknown> {
+  return { id, email, user_metadata: { full_name: isAdmin ? 'Admin' : email.split('@')[0] } };
+}
+
+let mockUserIdCounter = 0;
+const authChangeCallbacks: Array<(event: string, session: unknown) => void> = [];
+
+function notifyAuthChange(event: string, email: string) {
+  const session = email
+    ? { user: { id: CREDENTIALS[email]?.id ?? MOCK_USER_ID, email }, access_token: 'mock-token' }
+    : null;
+  for (const cb of authChangeCallbacks) {
+    try { cb(event, session); } catch { /* ignore */ }
+  }
+}
+
 const mockAuth = {
   signInWithPassword: async (_: { email: string; password: string }): Promise<{ data: { user: Record<string, unknown> } | null; error: { message: string; status: number } | null }> => {
     const cred = CREDENTIALS[_.email];
     if (!cred || cred.password !== _.password) {
       return { data: null, error: { message: 'Invalid email or password', status: 401 } };
     }
-    const profile = makeMockProfile(cred.isAdmin);
-    return { data: { user: profile as unknown as Record<string, unknown> }, error: null };
+    notifyAuthChange('SIGNED_IN', _.email);
+    return { data: { user: makeAuthUser(cred.email, cred.isAdmin, cred.id) }, error: null };
   },
   signUp: async (_: { email: string; password: string; options?: Record<string, unknown> }): Promise<{ data: { user: Record<string, unknown> } | null; error: { message: string; status: number } | null }> => {
     if (CREDENTIALS[_.email]) {
       return { data: null, error: { message: 'An account with this email already exists.', status: 422 } };
     }
-    return { data: { user: { ...makeMockProfile(false), email: _.email } as unknown as Record<string, unknown> }, error: null };
+    mockUserIdCounter++;
+    const uid = `mock-user-${Date.now()}-${mockUserIdCounter}`;
+    const fullName = (_.options?.data as Record<string, unknown> ?? {}).full_name as string ?? _.email.split('@')[0];
+    CREDENTIALS[_.email] = { password: _.password, isAdmin: false, id: uid, email: _.email, displayName: fullName };
+    return { data: { user: makeAuthUser(_.email, false, uid) }, error: null };
   },
   signInWithOAuth: async (_: { provider: string; options?: { redirectTo?: string } }): Promise<{ data: { provider: string; url: string } | null; error: null }> => ({ data: { provider: _.provider, url: _.options?.redirectTo ?? '/' }, error: null }),
   getUser: async (): Promise<{ data: { user: { id: string; email: string; user_metadata: Record<string, string> } } | null; error: null }> => ({
@@ -260,7 +293,16 @@ const mockAuth = {
     data: { session: { access_token: 'mock-token', user: { id: MOCK_USER_ID, email: 'demo@wbnursing.app' } } }, error: null,
   }),
   exchangeCodeForSession: async (_code: string): Promise<{ data: { session: null }; error: null }> => ({ data: { session: null }, error: null }),
-  signOut: async (): Promise<{ error: null }> => ({ error: null }),
+  signOut: async (): Promise<{ error: null }> => {
+    notifyAuthChange('SIGNED_OUT', '');
+    return { error: null };
+  },
+  onAuthStateChange: (callback: (event: string, session: unknown) => void) => {
+    authChangeCallbacks.push(callback);
+    return {
+      data: { subscription: { unsubscribe: () => { const i = authChangeCallbacks.indexOf(callback); if (i >= 0) authChangeCallbacks.splice(i, 1); } } },
+    };
+  },
 };
 
 const mockChannel = {

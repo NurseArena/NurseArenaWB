@@ -67,8 +67,8 @@ export default function LoginPage() {
       }
       profile = newProfile;
     }
-    setUser({ ...profile, isAdmin: (profile as any).is_admin } as Profile);
-    if ((profile as any).is_admin) {
+    setUser({ ...profile, isAdmin: (profile as any).is_admin ?? (profile as any).isAdmin } as Profile);
+    if ((profile as any).is_admin ?? (profile as any).isAdmin) {
       router.push('/admin');
     } else {
       router.push('/dashboard');
