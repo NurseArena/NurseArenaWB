@@ -83,7 +83,7 @@ export function useQuiz() {
         .single();
 
       if (quiz?.scoring_profile) {
-        scoringProfileRef.current = quiz.scoring_profile as ScoringProfile;
+        scoringProfileRef.current = quiz.scoring_profile as unknown as ScoringProfile;
       }
 
       const { data: quizQuestions } = await supabase
@@ -95,7 +95,7 @@ export function useQuiz() {
       let rawQuestions: Record<string, unknown>[] = [];
 
       if (quizQuestions?.length) {
-        const qs = quizQuestions as { questions: Record<string, unknown> }[];
+        const qs = quizQuestions as unknown as { questions: Record<string, unknown> }[];
         rawQuestions = qs.map((qq) => qq.questions);
       } else if (quiz) {
         const examId = quiz.exam_id as string;
@@ -299,7 +299,7 @@ export function useQuiz() {
           wrong_count: wrong,
           attempted_count: correct + wrong,
           status: 'submitted',
-        }).eq('id', sessionIdRef.current).then().catch(() => {});
+        }).eq('id', sessionIdRef.current).then(() => {}, () => {});
       }
 
       store.setState('finished');

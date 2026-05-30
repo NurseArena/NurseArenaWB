@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 
       if (randomQ?.length) {
         const shuffled = [...randomQ].sort(() => Math.random() - 0.5);
-        questions = shuffled.slice(0, count).map((q) => ({ questions: q }));
+        questions = shuffled.slice(0, count).map((q) => ({ questions: q })) as unknown as typeof questions;
       }
     }
 

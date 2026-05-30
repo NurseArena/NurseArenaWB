@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/store/authStore';
+import { useExamStore } from '@/store/examStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,12 +20,12 @@ const WB_DISTRICTS = [
 ];
 
 const EXAM_CHIPS = [
-  { id: 'JENPAS_UG_P1', label: 'JENPAS (UG) — Paper I' },
-  { id: 'JENPAS_UG_P2', label: 'JENPAS (UG) — Paper II (BHA)' },
-  { id: 'ANM_GNM', label: 'ANM & GNM' },
+  // { id: 'JENPAS_UG_P1', label: 'JENPAS (UG) — Paper I' },
+  // { id: 'JENPAS_UG_P2', label: 'JENPAS (UG) — Paper II (BHA)' },
+  // { id: 'ANM_GNM', label: 'ANM & GNM' },
   { id: 'JEPBN', label: 'JEPBN 2026' },
-  { id: 'JEMSCN', label: 'JEMScN 2026' },
-  { id: 'JEMAS', label: 'JEMAS (PG)' },
+  // { id: 'JEMSCN', label: 'JEMScN 2026' },
+  // { id: 'JEMAS', label: 'JEMAS (PG)' },
 ];
 
 const JEMAS_SUB_COURSES = [
@@ -79,12 +80,13 @@ export default function OnboardingPage() {
     setLoading(true);
     try {
       const supabase = createClient();
+      const finalExams = targetExams.includes('JEMAS') && jemasSubCourse
+        ? targetExams.filter(e => e !== 'JEMAS').concat(`JEMAS_${jemasSubCourse.replace(/[\s.]/g, '_').toUpperCase()}`)
+        : targetExams;
       const profileData: Record<string, unknown> = {
         displayName,
         photoURL: photoURL || null,
-        targetExams: targetExams.includes('JEMAS') && jemasSubCourse
-          ? targetExams.filter(e => e !== 'JEMAS').concat(`JEMAS_${jemasSubCourse.replace(/[\s.]/g, '_').toUpperCase()}`)
-          : targetExams,
+        targetExams: finalExams,
         jemasSubCourse: targetExams.includes('JEMAS') ? jemasSubCourse : '',
         currentStage,
         district,
@@ -97,6 +99,9 @@ export default function OnboardingPage() {
         const storeUser = useAuthStore.getState().user;
         if (storeUser) {
           setUser({ ...storeUser, ...profileData } as typeof storeUser);
+        }
+        if (finalExams.length > 0) {
+          useExamStore.getState().setActiveExam(finalExams[0] as never);
         }
       }
       router.push('/dashboard');

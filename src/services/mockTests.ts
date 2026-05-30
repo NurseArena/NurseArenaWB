@@ -11,7 +11,7 @@ export async function fetchUpcomingMockTests(examId?: string) {
   if (examId) query = query.eq('exam_id', examId);
   const { data, error } = await query;
   if (error) throw error;
-  return data as (MockTestEvent & { exams?: { name: string; code: string } })[];
+  return data as unknown as (MockTestEvent & { exams?: { name: string; code: string } })[];
 }
 
 export async function getMockTestCountdown(eventId: number) {

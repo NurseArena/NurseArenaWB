@@ -257,6 +257,7 @@ function makeAuthUser(email: string, isAdmin: boolean, id: string): Record<strin
 
 let mockUserIdCounter = 0;
 const authChangeCallbacks: Array<(event: string, session: unknown) => void> = [];
+let currentSession: { user: Record<string, unknown>; access_token: string } | null = null;
 
 function notifyAuthChange(event: string, email: string) {
   const session = email
@@ -267,12 +268,21 @@ function notifyAuthChange(event: string, email: string) {
   }
 }
 
+function buildSession(email: string): { user: Record<string, unknown>; access_token: string } {
+  const cred = CREDENTIALS[email];
+  return {
+    user: { id: cred?.id ?? MOCK_USER_ID, email },
+    access_token: 'mock-token',
+  };
+}
+
 const mockAuth = {
   signInWithPassword: async (_: { email: string; password: string }): Promise<{ data: { user: Record<string, unknown> } | null; error: { message: string; status: number } | null }> => {
     const cred = CREDENTIALS[_.email];
     if (!cred || cred.password !== _.password) {
       return { data: null, error: { message: 'Invalid email or password', status: 401 } };
     }
+    currentSession = buildSession(_.email);
     notifyAuthChange('SIGNED_IN', _.email);
     return { data: { user: makeAuthUser(cred.email, cred.isAdmin, cred.id) }, error: null };
   },
@@ -284,17 +294,31 @@ const mockAuth = {
     const uid = `mock-user-${Date.now()}-${mockUserIdCounter}`;
     const fullName = (_.options?.data as Record<string, unknown> ?? {}).full_name as string ?? _.email.split('@')[0];
     CREDENTIALS[_.email] = { password: _.password, isAdmin: false, id: uid, email: _.email, displayName: fullName };
+    currentSession = buildSession(_.email);
+    notifyAuthChange('SIGNED_IN', _.email);
     return { data: { user: makeAuthUser(_.email, false, uid) }, error: null };
   },
   signInWithOAuth: async (_: { provider: string; options?: { redirectTo?: string } }): Promise<{ data: { provider: string; url: string } | null; error: null }> => ({ data: { provider: _.provider, url: _.options?.redirectTo ?? '/' }, error: null }),
-  getUser: async (): Promise<{ data: { user: { id: string; email: string; user_metadata: Record<string, string> } } | null; error: null }> => ({
-    data: { user: { id: MOCK_USER_ID, email: 'demo@wbnursing.app', user_metadata: { full_name: 'Demo User' } } }, error: null,
-  }),
-  getSession: async (): Promise<{ data: { session: { access_token: string; user: { id: string; email: string } } } | null; error: null }> => ({
-    data: { session: { access_token: 'mock-token', user: { id: MOCK_USER_ID, email: 'demo@wbnursing.app' } } }, error: null,
-  }),
+  getUser: async (): Promise<{ data: { user: { id: string; email: string; user_metadata: Record<string, string> } } | null; error: null }> => {
+    if (currentSession) {
+      const email = currentSession.user.email as string;
+      const cred = CREDENTIALS[email];
+      return {
+        data: { user: { id: currentSession.user.id as string, email, user_metadata: { full_name: cred?.displayName ?? email.split('@')[0] } } },
+        error: null,
+      };
+    }
+    return { data: null, error: null };
+  },
+  getSession: async (): Promise<{ data: { session: { access_token: string; user: { id: string; email: string } } } | null; error: null }> => {
+    if (currentSession) {
+      return { data: { session: { access_token: currentSession.access_token, user: { id: currentSession.user.id as string, email: currentSession.user.email as string } } }, error: null };
+    }
+    return { data: null, error: null };
+  },
   exchangeCodeForSession: async (_code: string): Promise<{ data: { session: null }; error: null }> => ({ data: { session: null }, error: null }),
   signOut: async (): Promise<{ error: null }> => {
+    currentSession = null;
     notifyAuthChange('SIGNED_OUT', '');
     return { error: null };
   },

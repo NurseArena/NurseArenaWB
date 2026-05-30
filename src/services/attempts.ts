@@ -89,5 +89,5 @@ export async function fetchQuizAttempts(userId: string, examId?: string, limit =
   if (examId) query = query.eq('exam_id', examId);
   const { data, error } = await query;
   if (error) throw error;
-  return data as QuizAttempt[];
+  return data as unknown as QuizAttempt[];
 }

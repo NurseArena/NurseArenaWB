@@ -52,8 +52,19 @@ const CATEGORY_META: Record<QuestionCategory, { label: string; required: string[
   },
 };
 
+const COURSE_OPTIONS = [
+  { value: '', label: '— Select a course —' },
+  { value: 'JEPBN', label: 'JEPBN 2026' },
+  { value: 'JENPAS_UG_P1', label: 'JENPAS (UG) — Paper I' },
+  { value: 'JENPAS_UG_P2', label: 'JENPAS (UG) — Paper II (BHA)' },
+  { value: 'ANM_GNM', label: 'ANM & GNM' },
+  { value: 'JEMSCN', label: 'JEMScN 2026' },
+  { value: 'JEMAS', label: 'JEMAS (PG)' },
+];
+
 export function AdminQuestionUpload({ defaultCategory = 'general' }: { defaultCategory?: QuestionCategory }) {
   const [category, setCategory] = useState<QuestionCategory>(defaultCategory);
+  const [course, setCourse] = useState('');
   const [rows, setRows] = useState<UploadRow[]>([]);
   const [uploading, setUploading] = useState(false);
   const [result, setResult] = useState<{ success: number; failed: number } | null>(null);
@@ -117,6 +128,10 @@ export function AdminQuestionUpload({ defaultCategory = 'general' }: { defaultCa
   }, [handleFile]);
 
   const handleUpload = async () => {
+    if (!course) {
+      setResult({ success: 0, failed: 1 });
+      return;
+    }
     setUploading(true);
     setResult(null);
     try {
@@ -140,7 +155,7 @@ export function AdminQuestionUpload({ defaultCategory = 'general' }: { defaultCa
           pyq_year: category === 'pyq' ? (row.data.pyq_year ?? null) : null,
           is_rapid_fire: category === 'rapid_fire',
           subject_id: row.data.subject_id ?? null,
-          exam_id: row.data.exam_id ?? null,
+          exam_id: course,
         };
         const { error } = await supabase.from('questions').insert(insertData);
         if (error) failed++;
@@ -157,6 +172,19 @@ export function AdminQuestionUpload({ defaultCategory = 'general' }: { defaultCa
 
   return (
     <div className="space-y-6">
+      <div>
+        <label className="text-sm font-bold text-ink mb-2 block">Course</label>
+        <select
+          value={course}
+          onChange={(e) => setCourse(e.target.value)}
+          className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-ink text-sm"
+        >
+          {COURSE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
+      </div>
+
       <div className="flex gap-2 flex-wrap">
         {(Object.entries(CATEGORY_META) as [QuestionCategory, typeof meta][]).map(([key, m]) => (
           <button
@@ -224,7 +252,16 @@ export function AdminQuestionUpload({ defaultCategory = 'general' }: { defaultCa
         </Card>
       )}
 
-      {result && (
+      {result && !course && (
+        <Card className="p-4 border-danger/30">
+          <div className="flex items-center gap-3">
+            <AlertCircle size={20} className="text-danger" />
+            <span className="text-sm text-ink">Please select a course before uploading.</span>
+          </div>
+        </Card>
+      )}
+
+      {result && course && (
         <Card className={`p-4 ${result.failed > 0 ? 'border-danger/30' : 'border-success/30'}`}>
           <div className="flex items-center gap-3">
             {result.failed > 0 ? <AlertCircle size={20} className="text-danger" /> : <CheckCircle2 size={20} className="text-success" />}

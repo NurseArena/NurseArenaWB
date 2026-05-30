@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Mail } from 'lucide-react';
 import { LogoIcon } from '@/components/LogoIcon';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/authStore';
 
 const ALLOWED_DOMAINS = [
   'gmail.com', 'googlemail.com', 'hotmail.com', 'hotmail.in', 'hotmail.co.uk',
@@ -28,6 +29,22 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      const targetExams = (user.targetExams ?? []) as string[];
+      const isOnboarded = targetExams.length > 0;
+      if (user.isAdmin) {
+        router.push('/admin');
+      } else if (!isOnboarded) {
+        router.push('/onboarding');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [user, router]);
 
   const handleEmailRegister = async (e: React.FormEvent) => {
     e.preventDefault();

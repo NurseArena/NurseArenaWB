@@ -28,12 +28,19 @@ export function useMissions() {
         .eq('user_id', user.id)
         .eq('assigned_date', today);
 
-      const merged = missionData.map((m: Mission) => {
-        const um = userMissionData?.find((u: UserMission) => u.mission_id === m.id);
+      const merged = missionData.map((m: Record<string, unknown>) => {
+        const um = userMissionData?.find((u: Record<string, unknown>) => u.mission_id === m.id);
         return {
-          ...m,
-          progress: um?.progress ?? 0,
-          completed: um?.completed ?? false,
+          id: m.id as string,
+          exam_id: m.exam_id as string | undefined,
+          title: m.title as string,
+          description: m.description as string | undefined,
+          xp_reward: m.xp_reward as number,
+          condition_type: m.type as string,
+          condition_value: m.target as number,
+          is_daily: false,
+          progress: um?.progress as number ?? 0,
+          completed: um?.completed as boolean ?? false,
         };
       });
 

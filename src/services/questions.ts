@@ -15,7 +15,7 @@ export async function fetchQuestions(examId: string, subjectId?: string, limit =
 
   const { data, error } = await query;
   if (error) throw error;
-  return data as Question[];
+  return data as unknown as Question[];
 }
 
 export async function fetchQuestionsByIds(ids: string[]) {
@@ -26,7 +26,7 @@ export async function fetchQuestionsByIds(ids: string[]) {
     .in('id', ids);
 
   if (error) throw error;
-  return data as Question[];
+  return data as unknown as Question[];
 }
 
 export async function fetchPYQs(examId: string, year?: number) {
@@ -41,5 +41,5 @@ export async function fetchPYQs(examId: string, year?: number) {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data as Question[];
+  return data as unknown as Question[];
 }

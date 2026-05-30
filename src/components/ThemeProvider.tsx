@@ -30,21 +30,20 @@ function syncDOM(theme: Theme) {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
-  const synced = useRef(false);
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [resolved, setResolved] = useState(false);
 
   useEffect(() => {
-    if (synced.current) return;
-    synced.current = true;
     const actual = getInitialTheme();
     setThemeState(actual);
     syncDOM(actual);
+    setResolved(true);
   }, []);
 
   useEffect(() => {
-    if (!synced.current) return;
+    if (!resolved) return;
     syncDOM(theme);
-  }, [theme]);
+  }, [theme, resolved]);
 
   const setTheme = useCallback((t: Theme) => { setThemeState(t); }, []);
   const toggleTheme = useCallback(() => { setThemeState(prev => (prev === 'light' ? 'dark' : 'light')); }, []);
@@ -60,4 +59,12 @@ export function useTheme() {
   const ctx = useContext(ThemeCtx);
   if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
   return ctx;
+}
+
+export function useThemeResolved() {
+  const ctx = useContext(ThemeCtx);
+  if (!ctx) throw new Error('useThemeResolved must be used within ThemeProvider');
+  const [resolved, setResolved] = useState(false);
+  useEffect(() => { setResolved(true); }, []);
+  return resolved;
 }

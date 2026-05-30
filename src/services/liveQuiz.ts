@@ -5,13 +5,13 @@ export async function fetchUpcomingLiveQuizzes(examId?: string) {
   const supabase = createClient();
   let query = supabase
     .from('live_quiz_events')
-    .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id')
+    .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id, timezone, current_q_index')
     .in('status', ['scheduled', 'live'])
     .order('starts_at', { ascending: true });
   if (examId) query = query.eq('exam_id', examId);
   const { data, error } = await query;
   if (error) throw error;
-  return data as LiveQuizEvent[];
+  return data as unknown as LiveQuizEvent[];
 }
 
 export async function getLiveQuizState(quizEventId: number) {
@@ -81,7 +81,7 @@ export async function fetchQuizQuestions(quizEventId: number) {
   const { data, error } = await supabase
     .from('quiz_questions')
     .select('id, quiz_id, question_id, order_index, questions(id, question, option_a, option_b, option_c, option_d, difficulty, topic, subject_id)')
-    .eq('quiz_id', quiz.data.question_set_id)
+    .eq('quiz_id', quiz.question_set_id)
     .order('order_index');
   if (error) throw error;
   return data;

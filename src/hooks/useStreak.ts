@@ -11,7 +11,7 @@ export function useStreak() {
     if (!user) return null;
     try {
       const updated = await checkAndUpdateStreak(user.id);
-      if (updated) setUser(updated);
+      if (updated) setUser({ ...user, ...updated } as any);
       return updated;
     } catch (err) {
       console.error('Failed to update streak:', err);

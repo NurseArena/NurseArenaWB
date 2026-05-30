@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
@@ -14,10 +15,35 @@ import { EXAMS } from '@/lib/exam-config';
 import { SpeedSeekerBadge } from '@/components/gamification/SpeedSeekerBadge';
 
 export default function ProfilePage() {
-  const user = useAuthStore((s) => s.user);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const storeUser = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
+  const [fetchedUser, setFetchedUser] = useState<typeof storeUser>(null);
   const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const { marks, xp, currentTier } = useXP();
+
+  const user = fetchedUser ?? storeUser;
+
+  useEffect(() => {
+    if (storeUser) return;
+    (async () => {
+      const supabase = createClient();
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) return;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authUser.id)
+        .maybeSingle();
+      if (profile) {
+        const p = profile as Record<string, unknown>;
+        setFetchedUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
+        setUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
+      }
+    })();
+  }, [storeUser, setUser]);
 
   const totalCorrect = user?.totalCorrect ?? 0;
   const totalWrong = user?.totalWrong ?? 0;
@@ -25,7 +51,7 @@ export default function ProfilePage() {
   const totalAttempted = user?.totalQuestionsAttempted ?? 0;
   const bestMockScore = user?.bestMockScore ?? 0;
   const streakDays = user?.streakDays ?? 0;
-  const displayName = user?.displayName ?? 'Student';
+  const displayName = user?.displayName ?? user?.email ?? 'Student';
   const targetExams = user?.targetExams ?? [];
   const currentStage = user?.currentStage ?? '';
   const district = user?.district ?? '';
@@ -115,17 +141,18 @@ export default function ProfilePage() {
         </h2>
         <div className="space-y-2">
           {RAPID_FIRE_TIERS.map((t) => {
-            const unlocked = marks >= t.marksMilestone;
+            const isUnlocked = marks >= t.marksMilestone;
+            const isCompleted = isUnlocked && t.tier > 1;
             return (
               <div
                 key={t.tier}
                 className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm ${
-                  unlocked ? 'bg-success/10 text-success' : 'bg-surface2 text-ink-muted'
+                  isCompleted ? 'bg-success/10 text-success' : 'bg-surface2 text-ink-muted'
                 }`}
               >
                 <span className="font-bold">Tier {t.tier}: {t.name}</span>
-                <span className={`text-xs ${unlocked ? '' : ''}`}>
-                  {t.timerSeconds}s {unlocked ? '✓' : `(${t.marksMilestone} marks)`}
+                <span className="text-xs">
+                  {isCompleted ? `${t.timerSeconds}s ✓` : t.tier === 1 ? `${t.timerSeconds}s ● Active` : `${t.timerSeconds}s (${t.marksMilestone} marks)`}
                 </span>
               </div>
             );
@@ -164,14 +191,14 @@ export default function ProfilePage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              {theme === 'light' ? (
+              {mounted && (theme === 'light' ? (
                 <Sun size={20} className="text-ink-muted" />
               ) : (
                 <Moon size={20} className="text-ink-muted" />
-              )}
+              ))}
               <div>
                 <p className="text-sm font-medium text-ink">Theme</p>
-                <p className="text-xs text-ink-muted capitalize">{theme} mode</p>
+                {mounted && <p className="text-xs text-ink-muted capitalize">{theme} mode</p>}
               </div>
             </div>
             <Button variant="ghost" size="sm" onClick={toggleTheme}>

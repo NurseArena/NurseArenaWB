@@ -24,8 +24,7 @@ export function SubjectGrid() {
               <span className="text-3xl">{subject.icon}</span>
               <ArrowRight size={18} className="text-ink-muted group-hover:text-primary transition-colors" />
             </div>
-            <h3 className="text-lg font-bold text-ink mb-1">{subject.name}</h3>
-            <p className="text-xs text-ink-muted">{subject.totalQ} Questions · {subject.marks} marks</p>
+            <h3 className="text-lg font-bold text-ink">{subject.name}</h3>
           </Link>
         </motion.div>
       ))}

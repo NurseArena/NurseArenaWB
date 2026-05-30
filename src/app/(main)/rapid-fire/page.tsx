@@ -144,17 +144,18 @@ export default function RapidFirePage() {
           <p className="text-xs font-bold uppercase tracking-widest text-ink-muted mb-3">Tier Progress</p>
           <div className="space-y-2">
             {RAPID_FIRE_TIERS.map((t) => {
-              const unlocked = totalMarks >= t.marksMilestone;
+              const isUnlocked = totalMarks >= t.marksMilestone;
               const isCurrent = t.tier === currentTier.tier;
+              const isCompleted = isUnlocked && !isCurrent && t.tier > 1;
               return (
                 <div
                   key={t.tier}
                   className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm ${
-                    unlocked ? 'bg-success/10 text-success' : isCurrent ? 'bg-warning/10 text-warning' : 'bg-surface2 text-ink-muted'
+                    isCompleted ? 'bg-success/10 text-success' : isCurrent ? 'bg-warning/10 text-warning' : 'bg-surface2 text-ink-muted'
                   }`}
                 >
                   <span className="font-bold">
-                    {unlocked ? '✓' : isCurrent ? '►' : <Lock size={12} className="inline" />} Tier {t.tier}: {t.name}
+                    {isCompleted ? '✓' : isCurrent ? '►' : <Lock size={12} className="inline" />} Tier {t.tier}: {t.name}
                   </span>
                   <span className="text-xs">{t.timerSeconds}s</span>
                 </div>

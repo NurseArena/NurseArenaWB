@@ -31,7 +31,7 @@ export async function updateProfile(updates: Partial<Profile>) {
   return data as Profile;
 }
 
-export async function checkAndUpdateStreak(userId: string) {
+export async function checkAndUpdateStreak(userId: string): Promise<Partial<Profile> | null> {
   const supabase = createClient();
   const { data: { user: authUser } } = await supabase.auth.getUser();
   if (!authUser || authUser.id !== userId) {
@@ -67,7 +67,7 @@ export async function checkAndUpdateStreak(userId: string) {
     .select()
     .maybeSingle();
   if (error) throw error;
-  return data as Profile;
+  return data as Partial<Profile>;
 }
 
 export async function manageUser(userId: string, updates: Record<string, unknown>) {
@@ -98,5 +98,5 @@ export async function fetchAllUsers(limit = 1000, offset = 0) {
     .range(offset, offset + limit - 1)
     .limit(limit);
   if (error) throw error;
-  return data as Profile[];
+  return data as unknown as Profile[];
 }

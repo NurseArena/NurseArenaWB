@@ -109,7 +109,7 @@ export default function AdminQuizzesPage() {
       const { error: updateErr } = await supabase.from('questions').update({ quiz_pool_status: 'reserved' }).in('id', ids);
       if (!updateErr) {
         await supabase.from('quiz_questions').insert(
-          ids.map((qid: string, i: number) => ({ quiz_id: quizId, question_id: qid, order_index: i }))
+          (ids as string[]).map((qid, i) => ({ quiz_id: quizId, question_id: qid, order_index: i }))
         );
       }
     }

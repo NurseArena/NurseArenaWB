@@ -13,6 +13,7 @@ import {
   ScrollText,
 } from 'lucide-react';
 import { LogoIcon } from '@/components/LogoIcon';
+import { useAuthStore } from '@/store/authStore';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
@@ -28,6 +29,8 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const user = useAuthStore((s) => s.user);
+  const displayName = user?.displayName ?? 'Welcome';
 
   return (
     <aside className="hidden lg:flex w-64 flex-col fixed left-0 top-0 h-full bg-surface border-r border-border z-40">
@@ -72,7 +75,7 @@ export function Sidebar() {
             <User size={16} className="text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-ink truncate">Student</p>
+            <p className="text-sm font-medium text-ink truncate">{displayName}</p>
             <p className="text-[10px] text-ink-muted">NurseArena</p>
           </div>
         </div>

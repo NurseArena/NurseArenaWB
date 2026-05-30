@@ -28,7 +28,7 @@ export function useLiveQuiz() {
       const supabase = createClient();
       let query = supabase
         .from('live_quiz_events')
-        .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id, current_q_index')
+        .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id, current_q_index, timezone')
         .in('status', ['scheduled', 'live'])
         .order('starts_at', { ascending: true });
       if (examId) query = query.eq('exam_id', examId);
@@ -47,7 +47,7 @@ export function useLiveQuiz() {
       const supabase = createClient();
       const { data: quiz } = await supabase
         .from('live_quiz_events')
-        .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id, current_q_index')
+        .select('id, exam_id, title, description, status, starts_at, duration_min, question_set_id, scoring_profile_id, current_q_index, timezone')
         .eq('id', quizEventId)
         .single();
       if (!quiz) throw new Error('Quiz not found');
