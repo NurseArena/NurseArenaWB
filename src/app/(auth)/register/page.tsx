@@ -85,7 +85,7 @@ export default function RegisterPage() {
         id: userId,
         displayName: name || email,
         email: email,
-        targetExams: JSON.stringify([]),
+        targetExams: [],
         totalMarksEarned: 0,
         totalQuestionsAttempted: 0,
         totalCorrect: 0,
