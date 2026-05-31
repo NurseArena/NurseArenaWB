@@ -94,7 +94,7 @@ export default function RegisterPage() {
         rapidFireUnlockedTier: 1,
         streakDays: 0,
         profileCompletePct: 0,
-      }, { onConflict: 'id', ignoreDuplicates: false });
+      }, { onConflict: 'id' });
 
       if (profileError) {
         console.error('Register: profile upsert error', profileError);

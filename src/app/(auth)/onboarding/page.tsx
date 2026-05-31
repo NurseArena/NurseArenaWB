@@ -89,10 +89,10 @@ export default function OnboardingPage() {
         : targetExams;
       const profileData: Record<string, unknown> = {
         displayName,
-        photoURL: photoURL || null,
+        photourl: photoURL || null,
         targetExams: finalExams,
-        jemasSubCourse: targetExams.includes('JEMAS') ? jemasSubCourse : '',
-        currentStage,
+        jemassubcourse: targetExams.includes('JEMAS') ? jemasSubCourse : '',
+        currentstage: currentStage,
         district,
         institution: institution || '',
         profileCompletePct: 100,
