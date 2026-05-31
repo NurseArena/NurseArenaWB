@@ -97,7 +97,7 @@ export default function OnboardingPage() {
       const profileData: Record<string, unknown> = {
         displayName,
         photoURL: photoURL || null,
-        targetExams: finalExams,
+        targetExams: JSON.stringify(finalExams),
         jemasSubCourse: targetExams.includes('JEMAS') ? jemasSubCourse : '',
         currentStage,
         district,
