@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useAuthStore } from '@/store/authStore';
+import { useAuthStore, normalizeProfile } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -38,9 +38,9 @@ export default function ProfilePage() {
         .eq('id', authUser.id)
         .maybeSingle();
       if (profile) {
-        const p = profile as Record<string, unknown>;
-        setFetchedUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
-        setUser({ ...profile, isAdmin: p.is_admin ?? p.isAdmin } as never);
+        const normalized = normalizeProfile(profile);
+        setFetchedUser(normalized);
+        setUser(normalized);
       }
     })();
   }, [storeUser, setUser]);
@@ -60,7 +60,12 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     const supabase = createClient();
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Network error (e.g. Supabase project unreachable) — still clear local state
+    }
+    useAuthStore.getState().clear();
     router.push('/');
   };
 

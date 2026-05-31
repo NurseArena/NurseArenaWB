@@ -31,12 +31,11 @@ export async function GET(request: Request) {
         totalCorrect: 0,
         totalWrong: 0,
         totalSkipped: 0,
-        bestMockScore: 0,
         rapidFireUnlockedTier: 1,
         streakDays: 0,
         profileCompletePct: 0,
       },
-      { onConflict: 'id', ignoreDuplicates: true }
+      { onConflict: 'id', ignoreDuplicates: false }
     );
 
     const { data: profile } = await supabase

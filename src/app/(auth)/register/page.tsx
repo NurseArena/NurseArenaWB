@@ -28,6 +28,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [confirmed, setConfirmed] = useState(false);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
 
@@ -76,26 +77,57 @@ export default function RegisterPage() {
       return;
     }
 
-    if (data?.user) {
-      await supabase.from('profiles').upsert({
-        id: data.user.id,
-        displayName: name || data.user.email,
-        email: data.user.email ?? '',
+    const userId = data?.user?.id;
+    const hasSession = !!data?.session;
+
+    if (userId) {
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id: userId,
+        displayName: name || email,
+        email: email,
         targetExams: [],
         totalMarksEarned: 0,
         totalQuestionsAttempted: 0,
         totalCorrect: 0,
         totalWrong: 0,
         totalSkipped: 0,
-        bestMockScore: 0,
         rapidFireUnlockedTier: 1,
         streakDays: 0,
         profileCompletePct: 0,
-      }, { onConflict: 'id', ignoreDuplicates: true });
+      }, { onConflict: 'id', ignoreDuplicates: false });
+
+      if (profileError) {
+        console.error('Register: profile upsert error', profileError);
+      }
     }
 
-    router.push('/onboarding');
+    if (hasSession) {
+      setLoading(false);
+    } else {
+      setLoading(false);
+      setConfirmed(true);
+    }
   };
+
+  if (confirmed) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center px-4">
+        <div className="w-full max-w-sm text-center space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto">
+            <LogoIcon size={56} />
+          </div>
+          <h1 className="text-2xl font-bold text-ink">Check your email</h1>
+          <p className="text-sm text-ink-muted">
+            We sent a confirmation link to <span className="font-medium text-ink">{email}</span>.
+            Click it to activate your account, then come back and log in.
+          </p>
+          <Link href="/login" className="block text-primary font-bold hover:underline text-sm">
+            Back to login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4">

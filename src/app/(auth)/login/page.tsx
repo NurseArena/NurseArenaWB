@@ -91,11 +91,10 @@ export default function LoginPage() {
             totalCorrect: 0,
             totalWrong: 0,
             totalSkipped: 0,
-            bestMockScore: 0,
             rapidFireUnlockedTier: 1,
             streakDays: 0,
             profileCompletePct: 0,
-          }, { onConflict: 'id', ignoreDuplicates: true })
+          }, { onConflict: 'id' })
           .select()
           .maybeSingle();
         if (!newProfile) {
@@ -114,6 +113,12 @@ export default function LoginPage() {
           profile = newProfile;
         }
         console.log('Login: profile after upsert', { profile });
+      } else if (!profile.targetExams || (profile.targetExams as string[]).length === 0) {
+        await supabase
+          .from('profiles')
+          .update({ targetExams: [] })
+          .eq('id', user.id);
+        profile.targetExams = [];
       }
       const targetExams = (profile?.targetExams ?? []) as string[];
       const isOnboarded = targetExams.length > 0;
@@ -177,7 +182,7 @@ export default function LoginPage() {
           {!process.env.NEXT_PUBLIC_SUPABASE_URL && (
             <div className="text-xs text-ink-muted bg-danger/5 px-3 py-2 rounded-lg space-y-1">
               <p className="font-bold text-danger">⚠ Setup Required</p>
-              <p>Set <code className="bg-surface px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code> &amp; <code className="bg-surface px-1 rounded">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in <code className="bg-surface px-1 rounded">.env</code> to use the app.</p>
+              <p>Set <code className="bg-surface px-1 rounded">NEXT_PUBLIC_SUPABASE_URL</code> &amp; <code className="bg-surface px-1 rounded">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> in <code className="bg-surface px-1 rounded">.env</code> to use the app.</p>
               <p>Copy <code className="bg-surface px-1 rounded">.env.example</code> → <code className="bg-surface px-1 rounded">.env</code> and fill in your Supabase project credentials.</p>
             </div>
           )}

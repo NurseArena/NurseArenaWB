@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
 import type { Profile } from '@/types/user';
 
-const PROFILE_FIELDS = 'id, name, displayName, email, photoURL, phone, avatar_url, xp, level, streak, streakDays, longest_streak, is_admin, targetExams, jemasSubCourse, currentStage, institution, district, selected_exam_id, active_exam_id, totalMarksEarned, totalQuestionsAttempted, totalCorrect, totalWrong, totalSkipped, bestMockScore, rapidFireUnlockedTier, profileCompletePct, lastLoginAt, last_active_date, joinedAt, created_at';
+const PROFILE_FIELDS = 'id, name, displayName, email, photoURL, phone, avatar_url, xp, level, streak, streakDays, longest_streak, is_admin, targetExams, jemasSubCourse, currentStage, institution, district, selected_exam_id, active_exam_id, totalMarksEarned, totalQuestionsAttempted, totalCorrect, totalWrong, totalSkipped, rapidFireUnlockedTier, profileCompletePct, lastLoginAt, last_active_date, joinedAt, created_at';
 
 export async function getProfile(userId: string) {
   const supabase = createClient();

@@ -20,7 +20,7 @@ export default function AdminUsersPage() {
         const supabase = createClient();
         const { data } = await supabase
           .from('profiles')
-          .select('id, name, displayName, email, is_admin, totalMarksEarned, totalCorrect, totalWrong, totalSkipped, bestMockScore, rapidFireUnlockedTier, targetExams, district, lastLoginAt, joinedAt')
+          .select('id, name, displayName, email, is_admin, totalMarksEarned, totalCorrect, totalWrong, totalSkipped, rapidFireUnlockedTier, targetExams, district, lastLoginAt, joinedAt')
           .limit(500);
         if (!cancelled) setUsers((data ?? []) as Record<string, unknown>[]);
       } catch (err) {
@@ -60,7 +60,6 @@ export default function AdminUsersPage() {
       totalCorrect: 0,
       totalWrong: 0,
       totalSkipped: 0,
-      bestMockScore: 0,
       rapidFireUnlockedTier: 1,
     }).eq('id', userId);
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, totalMarksEarned: 0, totalCorrect: 0, totalWrong: 0, totalSkipped: 0, bestMockScore: 0, rapidFireUnlockedTier: 1 } : u));

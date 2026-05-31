@@ -57,13 +57,24 @@ export default function OnboardingPage() {
         return;
       }
       setUserId(user.id);
-      if (!storeUser) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-        if (profile) setUser(profile as typeof storeUser);
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('targetExams')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.targetExams && (profile.targetExams as string[]).length > 0) {
+        if (!storeUser) {
+          const { data: fullProfile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          if (fullProfile) setUser(fullProfile as typeof storeUser);
+        }
+        router.replace('/dashboard');
+        return;
       }
     }
     init();
@@ -95,7 +106,14 @@ export default function OnboardingPage() {
       };
 
       if (userId) {
-        await supabase.from('profiles').upsert({ id: userId, ...profileData }, { onConflict: 'id' });
+        const { error: upsertError } = await supabase.from('profiles').upsert({ id: userId, ...profileData }, { onConflict: 'id' });
+
+        if (upsertError) {
+          console.error('Onboarding upsert failed:', upsertError);
+          setLoading(false);
+          return;
+        }
+
         const storeUser = useAuthStore.getState().user;
         if (storeUser) {
           setUser({ ...storeUser, ...profileData } as typeof storeUser);
@@ -107,6 +125,8 @@ export default function OnboardingPage() {
       router.push('/dashboard');
     } catch (err) {
       console.error('Onboarding failed:', err);
+      setLoading(false);
+      return;
     } finally {
       setLoading(false);
     }
