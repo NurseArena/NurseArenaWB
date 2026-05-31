@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,23 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const setUser = useAuthStore((s) => s.setUser);
-  const user = useAuthStore((s) => s.user);
   const router = useRouter();
-
-  // Auto-redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      const targetExams = (user.targetExams ?? []) as string[];
-      const isOnboarded = targetExams.length > 0;
-      if (user.isAdmin) {
-        router.push('/admin');
-      } else if (!isOnboarded) {
-        router.push('/onboarding');
-      } else {
-        router.push('/dashboard');
-      }
-    }
-  }, [user, router]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();

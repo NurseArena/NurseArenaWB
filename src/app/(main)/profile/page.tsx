@@ -38,6 +38,7 @@ export default function ProfilePage() {
         .eq('id', authUser.id)
         .maybeSingle();
       if (profile) {
+        console.log('Profile fetched:', profile);
         const normalized = normalizeProfile(profile);
         setFetchedUser(normalized);
         setUser(normalized);
@@ -63,9 +64,9 @@ export default function ProfilePage() {
     try {
       await supabase.auth.signOut();
     } catch {
-      // Network error (e.g. Supabase project unreachable) — still clear local state
+      // ignore network errors
     }
-    useAuthStore.getState().clear();
+    useAuthStore.getState().setUser(null);
     router.push('/');
   };
 

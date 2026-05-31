@@ -58,6 +58,7 @@ export default function OnboardingPage() {
       }
       setUserId(user.id);
 
+      // Always fetch fresh from DB, never trust Zustand here
       const { data: profile } = await supabase
         .from('profiles')
         .select('targetExams')
@@ -65,14 +66,6 @@ export default function OnboardingPage() {
         .single();
 
       if (profile?.targetExams && (profile.targetExams as string[]).length > 0) {
-        if (!storeUser) {
-          const { data: fullProfile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-          if (fullProfile) setUser(fullProfile as typeof storeUser);
-        }
         router.replace('/dashboard');
         return;
       }
