@@ -27,7 +27,6 @@ export default function ProfilePage() {
   const user = fetchedUser ?? storeUser;
 
   useEffect(() => {
-    if (storeUser) return;
     (async () => {
       const supabase = createClient();
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -60,14 +59,12 @@ export default function ProfilePage() {
   const accuracy = totalAttempted > 0 ? Math.round((totalCorrect / totalAttempted) * 100) : 0;
 
   const handleLogout = async () => {
+    useAuthStore.getState().clear();
     const supabase = createClient();
     try {
-      await supabase.auth.signOut();
-    } catch {
-      // ignore network errors
-    }
-    useAuthStore.getState().setUser(null);
-    router.push('/');
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch { /* ignore network errors */ }
+    window.location.href = '/login';
   };
 
   return (

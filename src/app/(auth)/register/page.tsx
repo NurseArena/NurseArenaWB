@@ -85,7 +85,7 @@ export default function RegisterPage() {
         id: userId,
         displayName: name || email,
         email: email,
-        targetExams: [],
+        targetExams: JSON.stringify([]),
         totalMarksEarned: 0,
         totalQuestionsAttempted: 0,
         totalCorrect: 0,
@@ -98,6 +98,9 @@ export default function RegisterPage() {
 
       if (profileError) {
         console.error('Register: profile upsert error', profileError);
+        setError('Failed to create profile. Please try again.');
+        setLoading(false);
+        return;
       }
     }
 
