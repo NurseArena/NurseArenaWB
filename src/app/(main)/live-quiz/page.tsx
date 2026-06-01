@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Radio, Clock, CalendarDays } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 
 export default function LiveQuizPage() {
@@ -17,11 +18,23 @@ export default function LiveQuizPage() {
   const user = useAuthStore((s) => s.user);
   const [selectedOption, setSelectedOption] = useState<string | undefined>();
 
-  const examId = activeExam === 'JENPAS-UG' ? 'exam-ug-01' : 'exam-pg-01';
+  const [examDbId, setExamDbId] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUpcoming(examId);
-  }, [examId, fetchUpcoming]);
+    const supabase = createClient();
+    supabase
+      .from('exams')
+      .select('id')
+      .eq('code', activeExam.replace(/_/g, '-'))
+      .maybeSingle()
+      .then(({ data }: { data: { id: string } | null }) => {
+        if (data?.id) setExamDbId(data.id);
+      });
+  }, [activeExam]);
+
+  useEffect(() => {
+    if (examDbId) fetchUpcoming(examDbId);
+  }, [examDbId, fetchUpcoming]);
 
   const handleJoin = async (quizId: number) => {
     await joinQuiz(quizId);

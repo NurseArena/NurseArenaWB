@@ -67,17 +67,17 @@ export default function LoginPage() {
           .from('profiles')
           .upsert({
             id: user.id,
-            displayName: user.email,
+            displayname: user.email,
             email: user.email ?? '',
-            targetExams: [],
-            totalMarksEarned: 0,
-            totalQuestionsAttempted: 0,
-            totalCorrect: 0,
-            totalWrong: 0,
-            totalSkipped: 0,
-            rapidFireUnlockedTier: 1,
-            streakDays: 0,
-            profileCompletePct: 0,
+            targetexams: [],
+            totalmarksearned: 0,
+            totalquestionsattempted: 0,
+            totalcorrect: 0,
+            totalwrong: 0,
+            totalskipped: 0,
+            rapidfireunlockedtier: 1,
+            streakdays: 0,
+            profilecompletepct: 0,
           }, { onConflict: 'id' })
           .select()
           .maybeSingle();
@@ -97,14 +97,14 @@ export default function LoginPage() {
           profile = newProfile;
         }
         console.log('Login: profile after upsert', { profile });
-      } else if (!profile.targetExams || (profile.targetExams as string[]).length === 0) {
+      } else if (!profile.targetexams || (profile.targetexams as string[]).length === 0) {
         await supabase
           .from('profiles')
-          .update({ targetExams: [] })
+          .update({ targetexams: [] })
           .eq('id', user.id);
-        profile.targetExams = [];
+        profile.targetexams = [];
       }
-      const targetExams = (profile?.targetExams ?? []) as string[];
+      const targetExams = (profile?.targetexams ?? []) as string[];
       const isOnboarded = targetExams.length > 0;
       const isAdmin = !!(profile as any).is_admin;
       setUser({ ...profile, isAdmin } as Profile);

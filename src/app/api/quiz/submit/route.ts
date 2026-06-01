@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       marksDelta = marksAwarded ?? 1.0;
       const { data: profile } = await supabase
         .from('profiles')
-        .select('totalMarksEarned, totalCorrect, totalQuestionsAttempted')
+        .select('totalmarksearned, totalcorrect, totalquestionsattempted')
         .eq('id', user.id)
         .single();
 
@@ -64,9 +64,9 @@ export async function POST(request: Request) {
         await supabase
           .from('profiles')
           .update({
-            totalMarksEarned: (profile.totalMarksEarned ?? 0) + marksDelta,
-            totalCorrect: (profile.totalCorrect ?? 0) + 1,
-            totalQuestionsAttempted: (profile.totalQuestionsAttempted ?? 0) + 1,
+            totalmarksearned: (profile.totalmarksearned ?? 0) + marksDelta,
+            totalcorrect: (profile.totalcorrect ?? 0) + 1,
+            totalquestionsattempted: (profile.totalquestionsattempted ?? 0) + 1,
           })
           .eq('id', user.id);
       }
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
       marksDelta = marksAwarded ?? -0.25;
       const { data: profile } = await supabase
         .from('profiles')
-        .select('totalMarksEarned, totalWrong, totalQuestionsAttempted')
+        .select('totalmarksearned, totalwrong, totalquestionsattempted')
         .eq('id', user.id)
         .single();
 
@@ -82,9 +82,9 @@ export async function POST(request: Request) {
         await supabase
           .from('profiles')
           .update({
-            totalMarksEarned: Math.max(0, (profile.totalMarksEarned ?? 0) + marksDelta),
-            totalWrong: (profile.totalWrong ?? 0) + 1,
-            totalQuestionsAttempted: (profile.totalQuestionsAttempted ?? 0) + 1,
+            totalmarksearned: Math.max(0, (profile.totalmarksearned ?? 0) + marksDelta),
+            totalwrong: (profile.totalwrong ?? 0) + 1,
+            totalquestionsattempted: (profile.totalquestionsattempted ?? 0) + 1,
           })
           .eq('id', user.id);
       }

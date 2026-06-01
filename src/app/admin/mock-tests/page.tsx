@@ -24,7 +24,7 @@ export default function AdminMockTestsPage() {
 
   useEffect(() => {
     (async () => {
-      const { data: mtData } = await supabase.from('mock_tests').select('id, title, exam_id, serial_number, duration_minutes, scoring_profile_id, question_count, scheduled_at, created_at, exam:exams(name)').order('serial_number');
+      const { data: mtData } = await supabase.from('mock_tests').select('id, title, exam_id, serial_number, duration_seconds, scoring_profile_id, status, published_at, created_at, exam:exams(name)').order('serial_number');
       if (mtData) setMockTests(mtData as Record<string, unknown>[]);
       const { data: spData } = await supabase.from('quiz_scoring_profiles').select('id, name, marks_correct, marks_wrong');
       if (spData) setScoringProfiles(spData as Record<string, unknown>[]);

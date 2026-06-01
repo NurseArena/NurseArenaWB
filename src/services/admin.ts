@@ -116,7 +116,7 @@ export async function fetchQuestionsAdmin(filters?: { exam_id?: string; difficul
 
 export async function fetchAdminStats(): Promise<AdminStats> {
   const supabase = createClient();
-  const { data: users } = await supabase.from('profiles').select('id, targetExams').limit(5000);
+  const { data: users } = await supabase.from('profiles').select('id, targetexams').limit(5000);
   const { data: attempts } = await supabase
     .from('attempts')
     .select('attempted_at')
@@ -127,7 +127,7 @@ export async function fetchAdminStats(): Promise<AdminStats> {
 
   const perExam: Record<string, number> = {};
   (users as Record<string, unknown>[] ?? []).forEach((u) => {
-    const id = String(u.targetExams ?? 'none');
+    const id = String(u.targetexams ?? 'none');
     perExam[id] = (perExam[id] ?? 0) + 1;
   });
 

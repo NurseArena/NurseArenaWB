@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (profile && !error) {
-        const targetExams = (profile.targetExams ?? profile.target_exams ?? []) as string[];
+        const targetExams = (profile.targetexams ?? profile.targetExams ?? profile.target_exams ?? []) as string[];
         if (targetExams.length > 0) {
           setActiveExam(targetExams[0] as never);
         }

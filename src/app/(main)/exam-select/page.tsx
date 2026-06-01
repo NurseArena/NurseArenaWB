@@ -21,7 +21,7 @@ export default function ExamSelectPage() {
       if (exam) {
         await supabase
           .from('profiles')
-          .upsert({ id: user.id, targetExams: [code] }, { onConflict: 'id' });
+          .upsert({ id: user.id, targetexams: [code] }, { onConflict: 'id' });
       }
     }
     router.push('/dashboard');

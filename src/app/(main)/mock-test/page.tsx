@@ -16,10 +16,17 @@ export default function MockTestPage() {
   useEffect(() => {
     const fetch = async () => {
       const supabase = createClient();
+      // First resolve the DB UUID for the active exam code
+      const { data: examRow } = await supabase
+        .from('exams')
+        .select('id')
+        .eq('code', activeExam.replace(/_/g, '-'))
+        .maybeSingle();
+      if (!examRow?.id) return;
       const { data } = await supabase
         .from('quizzes')
         .select('id, title, type, question_count, duration_seconds, created_at')
-        .eq('exam_id', `exam-${activeExam.toLowerCase().replace(/_/g, '-')}`)
+        .eq('exam_id', examRow.id)
         .order('created_at', { ascending: false })
         .limit(20);
       if (data) setQuizzes(data);

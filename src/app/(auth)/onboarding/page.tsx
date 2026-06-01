@@ -88,14 +88,14 @@ export default function OnboardingPage() {
         ? targetExams.filter(e => e !== 'JEMAS').concat(`JEMAS_${jemasSubCourse.replace(/[\s.]/g, '_').toUpperCase()}`)
         : targetExams;
       const profileData: Record<string, unknown> = {
-        displayName,
+        displayname: displayName,
         photourl: photoURL || null,
-        targetExams: finalExams,
+        targetexams: finalExams,
         jemassubcourse: targetExams.includes('JEMAS') ? jemasSubCourse : '',
         currentstage: currentStage,
         district,
         institution: institution || '',
-        profileCompletePct: 100,
+        profilecompletepct: 100,
       };
 
       if (userId) {

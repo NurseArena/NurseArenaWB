@@ -1,7 +1,7 @@
-'use client';
-import { useState, useEffect, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
+'use clOOBient';
+OOOOOOOimport { useState, useEffect } from 'react';
+import { cOBreateClient } from '@/lib/supabase/client';
+import { ButOOOOOOOOOOOOOOOOOOOOOnton } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail } from 'lucide-react';
@@ -29,13 +29,11 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [confirmed, setConfirmed] = useState(false);
-  const isRegistering = useRef(false);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
 
-  // Auto-redirect if already logged in (skip during active registration flow)
+  // Auto-redirect if already logged in
   useEffect(() => {
-    if (isRegistering.current) return;
     if (user) {
       const targetExams = (user.targetExams ?? []) as string[];
       const isOnboarded = targetExams.length > 0;
@@ -59,67 +57,58 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    isRegistering.current = true;
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: name },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-      if (error) {
-        setError(error.message);
-        return;
-      }
-      if (data?.user?.identities?.length === 0) {
-        setError('An account with this email already exists.');
-        return;
-      }
-
-      const userId = data?.user?.id;
-      const hasSession = !!data?.session;
-
-      // Only upsert when an active session exists — RLS requires auth.uid().
-      // Without a session (email confirmation pending), the DB trigger
-      // `handle_new_user` already created the profile row with defaults.
-      if (userId && hasSession) {
-        const { error: profileError } = await supabase.from('profiles').upsert({
-          id: userId,
-          displayname: name || email,
-          email: email,
-          targetexams: [],
-          totalmarksearned: 0,
-          totalquestionsattempted: 0,
-          totalcorrect: 0,
-          totalwrong: 0,
-          totalskipped: 0,
-          rapidfireunlockedtier: 1,
-          streakdays: 0,
-          profilecompletepct: 0,
-        }, { onConflict: 'id' });
-
-        if (profileError) {
-          console.error('Register: profile upsert error', profileError);
-          setError('Failed to create profile. Please try again.');
-          return;
-        }
-      }
-
-      if (hasSession) {
-        // Auto-confirm is ON — session exists. The useEffect won't re-run
-        // (user ref in store already changed), so redirect manually.
-        router.push('/onboarding');
-      } else {
-        // Email confirmation required — show "check your email" screen.
-        setConfirmed(true);
-      }
-    } finally {
-      // Guaranteed to run on every path — error, early return, or success.
-      isRegistering.current = false;
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setError(error.message);
       setLoading(false);
+      return;
+    }
+    if (data?.user?.identities?.length === 0) {
+      setError('An account with this email already exists.');
+      setLoading(false);
+      return;
+    }
+
+    const userId = data?.user?.id;
+    const hasSession = !!data?.session;
+
+    if (userId) {
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id: userId,
+        displayName: name || email,
+        email: email,
+        targetExams: [],
+        totalMarksEarned: 0,
+        totalQuestionsAttempted: 0,
+        totalCorrect: 0,
+        totalWrong: 0,
+        totalSkipped: 0,
+        rapidFireUnlockedTier: 1,
+        streakDays: 0,
+        profileCompletePct: 0,
+      }, { onConflict: 'id' });
+
+      if (profileError) {
+        console.error('Register: profile upsert error', profileError);
+        setError('Failed to create profile. Please try again.');
+        setLoading(false);
+        return;
+      }
+    }
+
+    if (hasSession) {
+      setLoading(false);
+    } else {
+      setLoading(false);
+      setConfirmed(true);
     }
   };
 

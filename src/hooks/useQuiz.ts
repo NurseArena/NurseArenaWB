@@ -338,18 +338,19 @@ export function useQuiz() {
         const supabase = createClient();
         const { data: profile } = await supabase
           .from('profiles')
-          .select('totalMarksEarned, totalQuestionsAttempted, totalCorrect, totalWrong, totalSkipped')
+          .select('totalmarksearned, totalquestionsattempted, totalcorrect, totalwrong, totalskipped')
           .eq('id', user.id)
           .single();
         if (profile) {
+          const p = profile as Record<string, number>;
           await supabase
             .from('profiles')
             .update({
-              totalMarksEarned: (profile.totalMarksEarned ?? 0) + marksEarned,
-              totalQuestionsAttempted: (profile.totalQuestionsAttempted ?? 0) + totalMarks,
-              totalCorrect: (profile.totalCorrect ?? 0) + marksData.correct,
-              totalWrong: (profile.totalWrong ?? 0) + marksData.wrong,
-              totalSkipped: (profile.totalSkipped ?? 0) + marksData.skipped,
+              totalmarksearned: (p.totalmarksearned ?? 0) + marksEarned,
+              totalquestionsattempted: (p.totalquestionsattempted ?? 0) + totalMarks,
+              totalcorrect: (p.totalcorrect ?? 0) + marksData.correct,
+              totalwrong: (p.totalwrong ?? 0) + marksData.wrong,
+              totalskipped: (p.totalskipped ?? 0) + marksData.skipped,
             })
             .eq('id', user.id);
         }

@@ -22,29 +22,29 @@ export async function GET(request: Request) {
     await supabase.from('profiles').upsert(
       {
         id: user.id,
-        displayName: user.user_metadata?.full_name ?? user.email,
+        displayname: user.user_metadata?.full_name ?? user.email,
         email: user.email ?? '',
-        photoURL: user.user_metadata?.avatar_url,
-        targetExams: [],
-        totalMarksEarned: 0,
-        totalQuestionsAttempted: 0,
-        totalCorrect: 0,
-        totalWrong: 0,
-        totalSkipped: 0,
-        rapidFireUnlockedTier: 1,
-        streakDays: 0,
-        profileCompletePct: 0,
+        photourl: user.user_metadata?.avatar_url,
+        targetexams: [],
+        totalmarksearned: 0,
+        totalquestionsattempted: 0,
+        totalcorrect: 0,
+        totalwrong: 0,
+        totalskipped: 0,
+        rapidfireunlockedtier: 1,
+        streakdays: 0,
+        profilecompletepct: 0,
       },
       { onConflict: 'id', ignoreDuplicates: false }
     );
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('targetExams')
+      .select('targetexams')
       .eq('id', user.id)
       .single();
 
-    if (!profile || (profile.targetExams as string[] ?? []).length === 0) {
+    if (!profile || (profile.targetexams as string[] ?? []).length === 0) {
       return NextResponse.redirect(new URL('/onboarding', origin));
     }
   }
